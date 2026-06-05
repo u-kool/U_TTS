@@ -1,0 +1,22 @@
+# =============================================================================
+# requirements.txt для Qwen3-TTS Custom Docker
+# PyTorch уже установлен в базовом образе (pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel)
+# =============================================================================
+
+# Web framework
+flask>=3.0.0,<4.0.0
+werkzeug>=3.0.0,<4.0.0
+
+# Audio processing
+soundfile>=0.12.1,<0.14.0
+numpy>=1.26.0,<2.0.0
+
+# HuggingFace utilities
+huggingface-hub[cli]>=0.24.0
+
+# Основная библиотека TTS (соответствует импорту в qwen3tts_engine.py)
+faster-qwen3-tts>=0.1.0
+
+# Опционально: если faster-qwen3-tts не на PyPI, раскомментируйте строку ниже
+# и укажите путь к .whl файлу или GitHub репозиторию:
+# faster-qwen3-tts @ https://github.com/.../faster_qwen3_tts-0.1.0-py3-none-any.whl

@@ -1,0 +1,218 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0e0e0e; color:#efeff1; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; height:100vh; overflow:hidden; }
+.app-container { display:flex; height:100vh; width:100%; position:relative; }
+.chat-area { flex:8; display:flex; flex-direction:column; background:#0e0e0e; transition:flex 0.3s; }
+.chat-header { padding:12px 20px; background:#18181b; border-bottom:1px solid #2a2a2d; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.streamer-info { display:flex; align-items:center; gap:8px; }
+.streamer-avatar { width:32px; height:32px; border-radius:50%; background:#9146FF; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold; }
+.streamer-name { font-size:15px; font-weight:600; }
+.status-badge { display:flex; align-items:center; gap:6px; font-size:12px; color:#adadb8; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:#53535f; }
+.status-dot.online { background:#28a745; box-shadow:0 0 5px #28a745; }
+.action-buttons { display:flex; gap:8px; }
+.action-btn { background:#2a2a2d; border:none; color:#efeff1; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px; transition:all 0.2s; cursor:pointer; }
+.action-btn:hover { background:#3a3a3d; }
+.log-container { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:4px; }
+.log-entry { padding:6px 0; font-size:14px; line-height:1.4; word-wrap:break-word; display:flex; align-items:baseline; gap:8px; transition:opacity 0.3s; }
+.log-entry.chat { color:#efeff1; }
+.log-entry.event { color:#ffd700; background:rgba(255,215,0,0.08); padding:6px 10px; margin:2px 0; border-radius:8px; font-size:13px; }
+.log-entry.system { color:#adadb8; font-style:italic; font-size:12px; }
+.log-entry.error { color:#ff6b6b; }
+.log-time { color:#5a5a66; font-size:11px; flex-shrink:0; }
+.log-user { font-weight:600; color:#b8b8c9; flex-shrink:0; }
+.log-user.chat { color:#b8b8c9; }
+.log-user.event { color:#ffd700; }
+.log-text { word-break:break-word; }
+.log-text img { vertical-align:middle; max-height:1.4em; margin:0 1px; }
+.empty-chat { text-align:center; color:#5a5a66; padding:40px; font-size:14px; }
+
+/* Панели – увеличенная ширина для голосов */
+.settings-panel { position:fixed; top:0; right:-700px; width:700px; height:100vh; background:#18181b; border-left:1px solid #2a2a2d; transition:right 0.3s; z-index:1000; display:flex; flex-direction:column; box-shadow:-5px 0 20px rgba(0,0,0,0.5); }
+.events-panel { position:fixed; top:0; right:-900px; width:900px; height:100vh; background:#18181b; border-left:1px solid #2a2a2d; transition:right 0.3s; z-index:1000; display:flex; flex-direction:column; box-shadow:-5px 0 20px rgba(0,0,0,0.5); }
+.voice-map-panel { position:fixed; top:0; right:-800px; width:800px; height:100vh; background:#18181b; border-left:1px solid #2a2a2d; transition:right 0.3s; z-index:1000; display:flex; flex-direction:column; box-shadow:-5px 0 20px rgba(0,0,0,0.5); }
+.settings-panel.open, .events-panel.open, .voice-map-panel.open { right:0; }
+
+/* Общие стили для всех select – единообразие */
+select, .settings-select, .event-voice-select, .map-voice, .reward-voice-select, .adv-language, .event-language, .reward-language {
+    background: #2a2a2d;
+    border: 1px solid #3a3a3d;
+    color: #efeff1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+select:focus, .settings-select:focus, .event-voice-select:focus, .map-voice:focus, .reward-voice-select:focus {
+    border-color: #9146FF;
+}
+
+/* Элементы внутри dynamic-list-item – строка без переноса */
+.dynamic-list-item {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    background: #2a2a2d;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+}
+.dynamic-list-item input,
+.dynamic-list-item select {
+    flex: 1 1 auto;
+    min-width: 0;      /* позволяет сжиматься */
+    background: #1e1e21;
+    border: 1px solid #3a3a3d;
+    color: white;
+    padding: 6px;
+    border-radius: 4px;
+}
+.dynamic-list-item button {
+    background: #53535f;
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.dynamic-list-item button:hover {
+    background: #6c6c7a;
+}
+/* Кнопка удаления – красноватый оттенок */
+.dynamic-list-item .remove-item {
+    background: #8b3a3a;
+}
+.dynamic-list-item .remove-item:hover {
+    background: #a04444;
+}
+
+/* Дополнительные стили для заголовков панелей */
+.settings-header, .events-header, .voice-map-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid #2a2a2d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.settings-header h5, .events-header h5, .voice-map-header h5 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.header-btn {
+    background: none;
+    border: none;
+    color: #adadb8;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+.header-btn:hover {
+    background: #2a2a2d;
+    color: #efeff1;
+}
+.close-settings, .close-events, .close-voice-map {
+    background: none;
+    border: none;
+    color: #adadb8;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+}
+.close-settings:hover, .close-events:hover, .close-voice-map:hover {
+    color: #efeff1;
+}
+.settings-body, .events-body, .voice-map-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Другие общие элементы */
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.slider-row label {
+    min-width: 45px;
+    margin-bottom: 0 !important;
+    font-size: 14px;
+    font-weight: 500;
+}
+.slider-row .slider-value {
+    min-width: 110px;
+    text-align: left;
+    font-size: 12px;
+    color: #adadb8;
+}
+.slider-row input[type="range"] {
+    flex: 1;
+}
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin-right: 8px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #53535f;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+input:checked + .slider { background-color: #9146FF; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .settings-panel, .events-panel, .voice-map-panel {
+        width: 100%;
+        right: -100%;
+    }
+    .chat-area { flex: 1; }
+    .action-btn span { display: none; }
+    .dynamic-list-item { flex-wrap: wrap; } /* на мобилках можно переносить */
+}

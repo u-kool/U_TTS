@@ -1,0 +1,40 @@
+# === Core ===
+flask>=3.0.0,<4.0.0
+werkzeug>=3.0.0,<4.0.0
+soundfile>=0.12.1,<0.14.0
+huggingface-hub[cli]>=0.24.0
+numpy>=1.26.4,<2.0.0
+
+# === CosyVoice3 extra deps ===
+modelscope>=1.9.0,<2.0.0
+
+
+# === CosyVoice deps (subset from cosyvoice_repo/requirements.txt) ===
+conformer==0.3.2
+diffusers==0.29.0
+gdown==5.1.0
+hydra-core==1.3.2
+HyperPyYAML==1.2.3
+inflect==7.3.1
+librosa==0.10.2
+lightning==2.2.4
+matplotlib==3.7.5
+omegaconf==2.3.0
+onnxruntime-gpu==1.20.1
+setuptools>=70.0.0
+protobuf==4.25
+pyarrow==18.1.0
+pydantic==2.7.0
+pyworld==0.3.4
+rich==13.7.1
+tensorboard==2.14.0
+transformers==4.51.3
+wget==3.2
+x-transformers==2.11.24
+einx>=0.4.3
+einops>=0.7.0
+Cython>=0.29.0
+tqdm>=4.64.0
+scipy>=1.10.0
+pandas>=2.0.0
+Unidecode>=1.3.0

@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+venv_xtts/
+venv_xtts_requirements.txt
+*.egg-info/
+.git/
+.gitignore
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.bat

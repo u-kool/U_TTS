@@ -1,0 +1,32 @@
+services:
+  cosyvoice-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cosyvoice-tts-worker
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
+    environment:
+      - HF_HOME=/models/huggingface
+      - TTS_DATA_ROOT=/app
+      - WORKER_PORT=5003
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+    volumes:
+      - ../../data:/app/data
+      - models-cache:/models/huggingface
+      - pretrained-models:/app/pretrained_models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: "2gb"
+
+volumes:
+  models-cache:
+    name: cosyvoice-models-cache
+  pretrained-models:
+    name: cosyvoice-pretrained-models

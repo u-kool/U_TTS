@@ -1,0 +1,55 @@
+# Копируйте этот файл в папку с TwitchTTS.exe (рядом с папкой data/)
+# Запуск: docker compose up -d
+# Остановка: docker compose down
+# Переименовали папку? Просто перезапустите контейнеры (up -d)
+services:
+  qwen3-worker:
+    image: qwen3_tts-qwen3-worker:latest
+    container_name: qwen3-tts-worker
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    environment:
+      - QWEN3_MODEL_NAME=${QWEN3_MODEL_NAME:-Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice}
+      - QWEN3_DTYPE=bfloat16
+      - QWEN3_DEVICE_MAP=cuda:0
+      - HF_HOME=/models/huggingface
+      - TTS_DATA_ROOT=/app
+      - WORKER_PORT=5002
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+    volumes:
+      - ./data:/app/data
+      - models-cache:/models/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: "2gb"
+
+  xtts-worker:
+    image: xtts-xtts-worker:latest
+    container_name: xtts-tts-worker
+    restart: unless-stopped
+    ports:
+      - "5004:5004"
+    environment:
+      - TTS_DATA_ROOT=/app
+    volumes:
+      - ./data/voices:/app/data/voices
+      - ./data/outputs:/app/data/outputs
+      - ./data/latents:/app/data/latents
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  models-cache:
+    name: qwen3-custom-docker_models-cache
+    external: true

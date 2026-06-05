@@ -1,0 +1,37 @@
+services:
+  qwen3-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qwen3-tts-worker
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    environment:
+      # === Параметры модели ===
+      - QWEN3_MODEL_NAME=${QWEN3_MODEL_NAME:-Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice}
+      - QWEN3_DTYPE=${QWEN3_DTYPE:-bfloat16}
+      - QWEN3_DEVICE_MAP=${QWEN3_DEVICE_MAP:-cuda:0}
+      # === Системные ===
+      - HF_HOME=/models/huggingface
+      - TTS_DATA_ROOT=/app
+      - WORKER_PORT=5002
+      # === Оптимизация памяти ===
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+    volumes:
+      # ✅ Правильно: синхронизируем всю папку data/
+      - ${HOST_DATA_DIR:-G:/1/dist/data}:/app/data
+      # Кэш моделей (отдельный именованный том)
+      - models-cache:/models/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: "2gb"
+
+volumes:
+  models-cache:
+    name: qwen3-custom-docker_models-cache

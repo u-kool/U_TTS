@@ -1,0 +1,23 @@
+services:
+  xtts-worker:
+    build:
+      context: ../..
+      dockerfile: workers/xtts/Dockerfile
+    ports:
+      - "5004:5004"
+    environment:
+      - TTS_DATA_ROOT=/app
+    volumes:
+      - ${HOST_DATA_DIR:-G:/1/dist/data}/voices:/app/data/voices
+      - ${HOST_DATA_DIR:-G:/1/dist/data}/outputs:/app/data/outputs
+      - ${HOST_DATA_DIR:-G:/1/dist/data}/latents:/app/data/latents
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+
